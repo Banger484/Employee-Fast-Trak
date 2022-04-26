@@ -1,6 +1,7 @@
 require('dotenv').config();
 const inquirer = require('inquirer');
-const { allDepartments } = require('./helpers/queryFunctions')
+const qf = require('./helpers/queryFunctions')
+const cT = require('console.table')
 
 const options = [
     "View All - Employees",
@@ -10,9 +11,6 @@ const options = [
     "Add New - Role",
     "Add New - Department",
     "Update Role - Employee",
-    "Update Manager - Employee",
-    "Remove - Employee",
-    "Remove - Role",
     "Quit"
 ];
 
@@ -25,42 +23,57 @@ function init () {
             choices: options
         })
         .then((answers) => {
-            if(answers.menu === 'View All - Employees'){
-                console.log('view all employees wired');
-            }
-            if(answers.menu === 'View All - Roles'){
-                console.log('view all roles wired');
-            }
-            if(answers.menu === 'View All - Departments'){
-                console.log('view all departments wired');
-                allDepartments()
-            }
-            if(answers.menu === 'Add New - Employee'){
-                console.log('add employee wired');
-            }
-            if(answers.menu === 'Add New - Role'){
-                console.log('add role wired');
-            }
-            if(answers.menu === 'Add New - Department'){
-                console.log('add department wired');
-            }
-            if(answers.menu === 'Update Role - Employee'){
-                console.log('update role wired');
-            }
-            if(answers.menu === 'Update Manager - Employee'){
-                console.log('update manager wired');
-            }
-            if(answers.menu === 'Remove - Employee'){
-                console.log('remove employee wired');
-            }
-            if(answers.menu === 'Remove - Role'){
-                console.log('remove role wired');
-            }
-            if(answers.menu === 'Quit'){
-                return;
+            switch (answers.menu) {
+                case options[0]:
+                    qf.allEmployees()
+                    loopPrompt()
+                    break;
+                case options[1]:
+                    qf.allRoles()
+                    loopPrompt()
+                    break;
+                case options[2]:
+                    qf.allDepartments()
+                    loopPrompt()
+                    break;
+                case options[3]:
+                    break;
+                case options[4]:
+                    break;
+                case options[5]:
+                    break;
+                case options[6]:
+                    break;
+                case options[7]:
+                    return
+                    break;
+                default:
+                    break;
             }
         })
 }
 
 init()
 
+function loopPrompt () {
+    inquirer
+        .prompt([
+            {
+                name: 'loop back',
+                type: 'confirm',
+                message: 'Would you like to perform more tasks?'
+            }
+        ])
+        .then(answer => {
+            if(answer['loop back']) {
+                return init()
+            } else {
+                return
+            }
+        })
+}
+
+function newEmployee () {
+    inquirer
+        .prompt()
+}
