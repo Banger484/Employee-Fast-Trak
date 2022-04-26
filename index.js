@@ -2,6 +2,7 @@ require('dotenv').config();
 const inquirer = require('inquirer');
 const qf = require('./helpers/queryFunctions')
 const cT = require('console.table')
+const task = require('./helpers/tasks')
 
 const options = [
     "View All - Employees",
@@ -45,7 +46,7 @@ function init () {
                 case options[6]:
                     break;
                 case options[7]:
-                    return
+                    console.log('Thank you for using Employee Fast Trak.');
                     break;
                 default:
                     break;
@@ -54,6 +55,7 @@ function init () {
 }
 
 init()
+
 
 function loopPrompt () {
     inquirer
@@ -68,12 +70,8 @@ function loopPrompt () {
             if(answer['loop back']) {
                 return init()
             } else {
-                return
+                console.log('Thank you for using Employee Fast Trak.');
             }
         })
 }
 
-function newEmployee () {
-    inquirer
-        .prompt()
-}
