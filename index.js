@@ -1,7 +1,6 @@
 require('dotenv').config();
 const inquirer = require('inquirer');
 const cT = require('console.table')
-const task = require('./helpers/tasks')
 const db = require('./db/connection')
 
 
@@ -45,8 +44,69 @@ function init () {
                     })
                     break;
                 case options[3]:
+                    inquirer
+                        .prompt([
+                            {
+                            type: 'input',
+                            name: 'FirstName',
+                            message: 'What is the first name of the new employee?' 
+                            },
+                            {
+                                type: 'input',
+                                name: 'LastName',
+                                message: 'What is the last name of the new employee?'
+                            },
+                            {
+                                type: 'number',
+                                name: 'RoleID',
+                                message: 'What is the role of your new employee?'
+                            },
+                            {
+                                type: 'number',
+                                name: 'ManagerID',
+                                message: 'Please provide the manager ID for the new employee, if applicable.',
+                            }
+                        ])
+                        .then(a => {
+                            if(!a.ManagerID) {
+                                console.log('this works');
+                               db.query('INSERT INTO employee (first_name, last_name, role_id) VALUES (?, ?, ?)',[a.FirstName, a.LastName, a.RoleID], function (err, results) {
+                                console.log(`Employee roster is updated, ${a.FirstName} ${a.LastName} added!`);
+                                nextTask()
+                            }) 
+                            } else {
+                                console.log('does this work?');
+                                db.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)',[a.FirstName, a.LastName, a.RoleID, a.ManagerID], function (err, results) {
+                                    console.log(`Employee roster is updated, ${a.FirstName} ${a.LastName} added!`);
+                                    nextTask()
+                                })  
+                            }
+                        })
                     break;
                 case options[4]:
+                    inquirer
+                        .prompt([
+                            {
+                            type: 'input',
+                            name: 'RoleTitle',
+                            message: 'What is the title of your new Role?' 
+                            },
+                            {
+                                type: 'number',
+                                name: 'RoleSalary',
+                                message: 'What is the salary for this role?'
+                            },
+                            {
+                                type: 'number',
+                                name: 'DeptID',
+                                message: 'What is the ID of the department this role belongs to?'
+                            }])
+                        .then(a => {
+                            db.query('INSERT INTO role (title, salary, dept_id) VALUES (?, ?, ?)',[a.RoleTitle, a.RoleSalary, a.DeptID], function (err, results) {
+                                console.log(`Role list is updated, ${a.RoleTitle} added!`);
+                                nextTask()
+                            })
+                        })
                     break;
                 case options[5]:
                     inquirer
@@ -66,6 +126,7 @@ function init () {
                         })
                     break;
                 case options[6]:
+                    // update employee
                     break;
                 case options[7]:
                     console.log('Thank you for using Employee Fast Trak.');
