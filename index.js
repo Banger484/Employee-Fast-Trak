@@ -1,8 +1,9 @@
 require('dotenv').config();
 const inquirer = require('inquirer');
-const qf = require('./helpers/queryFunctions')
 const cT = require('console.table')
 const task = require('./helpers/tasks')
+const db = require('./db/connection')
+
 
 const options = [
     "View All - Employees",
@@ -20,28 +21,49 @@ function init () {
         .prompt({
             type: 'list',
             name: 'menu',
-            message: 'Welcome, please select a task below.',
+            message: 'Please select a task below.',
             choices: options
         })
         .then((answers) => {
             switch (answers.menu) {
                 case options[0]:
-                    qf.allEmployees()
-                    loopPrompt()
+                    db.query('SELECT * FROM employee', function (err, results) {
+                        console.table(results)
+                        return nextTask()
+                    })
                     break;
                 case options[1]:
-                    qf.allRoles()
-                    loopPrompt()
+                    db.query('SELECT * FROM role', function (err, results) {
+                        console.table(results)
+                        return nextTask()
+                    })
                     break;
                 case options[2]:
-                    qf.allDepartments()
-                    loopPrompt()
+                    db.query('SELECT * FROM department', function (err, results) {
+                        console.table(results) 
+                        return nextTask()
+                    })
                     break;
                 case options[3]:
                     break;
                 case options[4]:
                     break;
                 case options[5]:
+                    inquirer
+                        .prompt(
+                            {
+                            type: 'input',
+                            name: 'DeptName',
+                            message: 'What is the name of your new Department?' 
+                            })
+                        .then(answer => {
+                            db.query('INSERT INTO department (dept_name) VALUES (?)', answer.DeptName, function (err, results) {
+                                console.log(answer.DeptName);
+                                console.log(results);
+                                console.log(`Department list is updated, ${answer.DeptName} added!`);
+                                nextTask()
+                            })
+                        })
                     break;
                 case options[6]:
                     break;
@@ -56,22 +78,20 @@ function init () {
 
 init()
 
-
-function loopPrompt () {
+function nextTask () {
     inquirer
-        .prompt([
-            {
-                name: 'loop back',
-                type: 'confirm',
-                message: 'Would you like to perform more tasks?'
-            }
-        ])
-        .then(answer => {
-            if(answer['loop back']) {
-                return init()
-            } else {
-                console.log('Thank you for using Employee Fast Trak.');
-            }
-        })
-}
+    .prompt({
+        type: 'list',
+        name: 'continue',
+        message: 'Would you like to perform another task?',
+        choices: ['Yes, continue.', 'No, I am finished.']
+    })
+    .then(answer => {
+        if (answer.continue === 'Yes, continue.') {
+            init()
+        } else {
+            return console.log('Thank you for using Employee Fast Trak.');
 
+        }
+    })
+}
